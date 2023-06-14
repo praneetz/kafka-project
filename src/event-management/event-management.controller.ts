@@ -15,8 +15,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/core/enum';
 import { Roles } from 'src/auth/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('event-management')
+@ApiTags("event-management")
+@Controller('event')
 export class EventManagementController {
   constructor(
     private readonly eventManagementService: EventManagementService,
@@ -29,8 +31,8 @@ export class EventManagementController {
     return this.eventManagementService.create(createEventManagementDto);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin, Role.Organizer)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @Roles(Role.Admin, Role.Organizer)
   @Get()
   async findAll() {
     return this.eventManagementService.findAll();

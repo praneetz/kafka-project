@@ -20,7 +20,12 @@ export class EventManagementService {
   }
 
   async findAll() {
-    return await this.eventsRepository.find();
+    const data = await this.eventsRepository.find();
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: 'Event fetched successfull.',
+      data,
+    };
   }
 
   async findOne(id: number) {
