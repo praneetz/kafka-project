@@ -1,4 +1,5 @@
 import {
+  Req,
   Controller,
   Get,
   Post,
@@ -7,6 +8,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
+  MiddlewareConsumer,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EventManagementService } from './event-management.service';
 import { CreateEventManagementDto } from './dto/create-event-management.dto';
@@ -17,7 +21,7 @@ import { Role } from 'src/core/enum';
 import { Roles } from 'src/auth/roles.decorator';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags("event-management")
+@ApiTags('event-management')
 @Controller('event')
 export class EventManagementController {
   constructor(
@@ -27,19 +31,24 @@ export class EventManagementController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
   @Post()
-  async create(@Body() createEventManagementDto: CreateEventManagementDto) {
+  async create(
+    @Req() req: { user: { id: string } },
+    @Body() createEventManagementDto: CreateEventManagementDto,
+  ) {
+    createEventManagementDto.eventOrganizer = req.user.id;
     return this.eventManagementService.create(createEventManagementDto);
-  }
-
-  // @UseGuards(AuthGuard('jwt'), RolesGuard)
-  // @Roles(Role.Admin, Role.Organizer)
-  @Get()
-  async findAll() {
-    return this.eventManagementService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
+  @Get()
+  async findAll() {
+    console.log('Controller');
+    return this.eventManagementService.findAll();
+  }
+
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @Roles(Role.Admin, Role.Organizer)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.eventManagementService.findOne(+id);
@@ -49,16 +58,21 @@ export class EventManagementController {
   @Roles(Role.Admin, Role.Organizer)
   @Patch(':id')
   update(
+    @Req() req: Request,
     @Param('id') id: string,
     @Body() updateEventManagementDto: UpdateEventManagementDto,
   ) {
-    return this.eventManagementService.update(+id, updateEventManagementDto);
+    return this.eventManagementService.update(
+      +id,
+      updateEventManagementDto,
+      req,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventManagementService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: Request) {
+    return this.eventManagementService.remove(+id, req);
   }
 }

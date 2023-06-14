@@ -50,19 +50,44 @@ export class EventManagementService {
     }
   }
 
-  async update(id: number, updateEventManagementDto: UpdateEventManagementDto) {
-    await this.eventsRepository.save({ id: id, ...updateEventManagementDto });
+  async update(
+    id: number,
+    updateEventManagementDto: UpdateEventManagementDto,
+    req,
+  ) {
+    const event = await this.eventsRepository.findOne({ where: { id } });
+    if (
+      (event && req.user.id == event.eventOrganizer) ||
+      (event && req.user.role === 'admin')
+    ) {
+      await this.eventsRepository.save({ id: id, ...updateEventManagementDto });
+      return {
+        status: HttpStatus.ACCEPTED,
+        message: 'Event Updated successfull.',
+      };
+    }
     return {
-      status: HttpStatus.ACCEPTED,
-      message: 'Event Updated successfull.',
+      status: HttpStatus.NON_AUTHORITATIVE_INFORMATION,
+      message: 'Event Update Failed .',
     };
   }
 
-  async remove(id: number) {
-    await this.eventsRepository.delete(id);
+  async remove(id: number, req) {
+    const event = await this.eventsRepository.findOne({ where: { id } });
+    if (
+      (event && req.user.id == event.eventOrganizer) ||
+      (event && req.user.role === 'admin')
+    ) {
+      await this.eventsRepository.delete(id);
+      return {
+        status: HttpStatus.ACCEPTED,
+        message: 'Event deleted successfull.',
+      };
+    }
+
     return {
-      status: HttpStatus.ACCEPTED,
-      message: 'Event deleted successfull.',
+      status: HttpStatus.NON_AUTHORITATIVE_INFORMATION,
+      message: 'Event deleted failed.',
     };
   }
 }

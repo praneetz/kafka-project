@@ -21,5 +21,5 @@ export class Event {
   eventDescription: string;
 
   @Column()
-  eventOrganizer: number;
+  eventOrganizer: string;
 }

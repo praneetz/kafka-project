@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventManagementModule } from './event-management/event-management.module';
 import { Event } from './event-management/entities/event-management.entity';
+import { UserCheckMiddleware } from './common/middleware/checkUser.middleware';
 
 @Module({
   imports: [
@@ -19,14 +20,18 @@ import { Event } from './event-management/entities/event-management.entity';
       username: 'postgres',
       password: '1234',
       database: 'eventManager',
-      entities: [Users,Event],
+      entities: [Users, Event],
       synchronize: true,
     }),
     AuthModule,
     UsersModule,
-    EventManagementModule
+    EventManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserCheckMiddleware).forRoutes('event');
+  }
+}
