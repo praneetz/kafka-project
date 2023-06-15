@@ -8,7 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventManagementModule } from './event-management/event-management.module';
 import { Event } from './event-management/entities/event-management.entity';
-import { UserCheckMiddleware } from './common/middleware/checkUser.middleware';
+import { JoineeModule } from './joinee/joinee.module';
+import { Joinee } from './joinee/entities/joinee.entity';
 
 @Module({
   imports: [
@@ -20,18 +21,15 @@ import { UserCheckMiddleware } from './common/middleware/checkUser.middleware';
       username: 'postgres',
       password: '1234',
       database: 'eventManager',
-      entities: [Users, Event],
+      entities: [Users, Event, Joinee],
       synchronize: true,
     }),
     AuthModule,
     UsersModule,
     EventManagementModule,
+    JoineeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserCheckMiddleware).forRoutes('event');
-  }
-}
+export class AppModule {}

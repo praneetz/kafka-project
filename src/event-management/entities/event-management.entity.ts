@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Joinee } from 'src/joinee/entities/joinee.entity';
+import { Users } from 'src/users/user.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Event {
@@ -20,6 +29,10 @@ export class Event {
   @Column()
   eventDescription: string;
 
-  @Column()
+  @ManyToOne(() => Users, (user) => user.id)
+  @JoinColumn({ name: 'eventOrganizer' })
   eventOrganizer: string;
+
+  @OneToMany(() => Joinee, (joinee) => joinee.event)
+  joinee: Joinee[];
 }

@@ -8,30 +8,31 @@ import { Users } from 'src/users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-
-
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Users)
     private userModel: Repository<Users>,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(UserInfo: any) {
     try {
       let payload: JWT_PayloadInterface = {
         id: UserInfo.id,
         role: UserInfo.role,
-        tokenVersion: UserInfo.tokenVersion
-      }
-      let token = await this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: "24h" })
+        tokenVersion: UserInfo.tokenVersion,
+      };
+      let token = await this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '24h',
+      });
       return {
         status: HttpStatus.ACCEPTED,
         message: 'Login successfull.',
         data: {
           user: UserInfo,
-          token
+          token,
         },
       };
     } catch (error) {
@@ -41,8 +42,11 @@ export class AuthService {
 
   async signup(signupData: SignupDto) {
     try {
-      signupData.password = await bcrypt.hash(signupData.password, 10)
-      const data = { ...signupData, fullName: signupData.firstName + " " + signupData.lastName }
+      signupData.password = await bcrypt.hash(signupData.password, 10);
+      const data = {
+        ...signupData,
+        fullName: signupData.firstName + ' ' + signupData.lastName,
+      };
       await this.userModel.insert(data);
       return {
         status: HttpStatus.CREATED,
@@ -50,7 +54,10 @@ export class AuthService {
         data: {},
       };
     } catch (error) {
-      throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch users',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

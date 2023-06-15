@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateEventManagementDto } from './dto/create-event-management.dto';
 import { UpdateEventManagementDto } from './dto/update-event-management.dto';
 import { Event } from './entities/event-management.entity';
+import kafkaConfig from '../kafka.config';
 
 @Injectable()
 export class EventManagementService {
@@ -11,16 +12,56 @@ export class EventManagementService {
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
   ) {}
+
+  // kafka producer
+  async kafkaProducer(topic: string, msg: string) {
+    const producer = kafkaConfig.producer();
+
+    await producer.connect();
+    await producer.send({
+      topic: topic,
+      messages: [{ value: msg }],
+    });
+  }
+  // kafka consumner
+  async kafkaConsumer(topic: string) {
+    const consumer = kafkaConfig.consumer({ groupId: 'test-group' });
+    await consumer.connect();
+    await consumer.subscribe({ topic: topic, fromBeginning: true });
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        console.log({
+          value: message.value.toString(),
+        });
+      },
+    });
+  }
+
   async create(createEventManagementDto: CreateEventManagementDto) {
     await this.eventsRepository.insert(createEventManagementDto);
+    // this.kafkaProducer('eventCreated', 'event created successfully');
+    // this.kafkaConsumer('eventCreated');
     return {
       status: HttpStatus.ACCEPTED,
       message: 'Event Inserted successfull.',
     };
   }
 
+  async getOrganizerEvents(id: string) {
+    const events = await this.eventsRepository.find({
+      where: { eventOrganizer: id },
+    });
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: 'Event fetched successfull.',
+      data: events,
+    };
+  }
+
   async findAll() {
-    const data = await this.eventsRepository.find();
+    const data = await this.eventsRepository.find({
+      relations: ['joinee', 'eventOrganizer'],
+    });
     return {
       status: HttpStatus.ACCEPTED,
       message: 'Event fetched successfull.',

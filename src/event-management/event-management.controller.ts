@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/core/enum';
 import { Roles } from 'src/auth/roles.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('event-management')
 @Controller('event')
@@ -30,6 +30,7 @@ export class EventManagementController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
+  @ApiBearerAuth()
   @Post()
   async create(
     @Req() req: { user: { id: string } },
@@ -39,11 +40,19 @@ export class EventManagementController {
     return this.eventManagementService.create(createEventManagementDto);
   }
 
+  // get organizer event
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin, Role.Organizer)
+  @Roles(Role.Organizer)
+  @ApiBearerAuth()
+  @Get('organizer/events')
+  async getOrganizerEvents(@Req() req: { user: { id: string } }) {
+    return this.eventManagementService.getOrganizerEvents(req.user.id);
+  }
+
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @Roles(Role.Admin, Role.Organizer)
   @Get()
   async findAll() {
-    console.log('Controller');
     return this.eventManagementService.findAll();
   }
 
@@ -56,6 +65,7 @@ export class EventManagementController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
+  @ApiBearerAuth()
   @Patch(':id')
   update(
     @Req() req: Request,
@@ -71,6 +81,7 @@ export class EventManagementController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.Organizer)
+  @ApiBearerAuth()
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.eventManagementService.remove(+id, req);
