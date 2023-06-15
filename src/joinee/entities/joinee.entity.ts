@@ -1,5 +1,11 @@
 import { Event } from 'src/event-management/entities/event-management.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Joinee {
@@ -9,11 +15,10 @@ export class Joinee {
   @Column()
   username: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
-
-  @ManyToOne(() => Event, event => event.joinee)
+  @ManyToOne(() => Event, (event) => event.joinee)
   @JoinColumn({ name: 'eventId' })
   event: string;
 }

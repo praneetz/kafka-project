@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { JoineeService } from './joinee.service';
 import { CreateJoineeDto } from './dto/create-joinee.dto';
 import { UpdateJoineeDto } from './dto/update-joinee.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('joinee')
 @Controller('joinee')
 export class JoineeController {
   constructor(private readonly joineeService: JoineeService) {}
