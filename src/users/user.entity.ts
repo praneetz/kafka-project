@@ -46,14 +46,6 @@ export class Users {
     password: string;
 
     @Column({
-        type: 'enum',
-        enum: Gender,
-        nullable: false,
-    })
-    @ApiProperty()
-    gender: Gender;
-
-    @Column({
         type: 'integer',
         nullable: false,
         default: 0,
