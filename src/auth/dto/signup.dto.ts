@@ -35,13 +35,6 @@ export class SignupDto {
   @Length(3, 30, { message: 'Password length should be in range 3-10' })
   password: string;
 
-  @ApiProperty({ description: 'Gender of the user', example: 'male' })
-  @IsNotEmpty({ message: 'Gender is required' })
-  @IsString({ message: 'Gender should be in string' })
-  @IsIn(Object.values(Gender), {
-    message: "Gender must be either 'male' or 'female'",
-  })
-  gender: Gender;
 
   @ApiProperty({ description: 'Role of the user', example: 'user' })
   @IsNotEmpty({ message: 'Role is required' })
