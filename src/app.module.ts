@@ -10,6 +10,7 @@ import { EventManagementModule } from './event-management/event-management.modul
 import { Event } from './event-management/entities/event-management.entity';
 import { JoineeModule } from './joinee/joinee.module';
 import { Joinee } from './joinee/entities/joinee.entity';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -19,11 +20,12 @@ import { Joinee } from './joinee/entities/joinee.entity';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1234',
-      database: 'eventManager',
+      password: 'Amit@0274',
+      database: 'setup',
       entities: [Users, Event, Joinee],
       synchronize: true,
     }),
+    SocketModule,
     AuthModule,
     UsersModule,
     EventManagementModule,

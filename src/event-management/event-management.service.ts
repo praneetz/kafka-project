@@ -5,12 +5,15 @@ import { CreateEventManagementDto } from './dto/create-event-management.dto';
 import { UpdateEventManagementDto } from './dto/update-event-management.dto';
 import { Event } from './entities/event-management.entity';
 import kafkaConfig from '../kafka.config';
+import { SocketGateway } from 'src/socket/chat.gateway';
+import {JWT_PayloadInterface }from "src/core/interfaces"
 
 @Injectable()
 export class EventManagementService {
   constructor(
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
+    private readonly socket: SocketGateway
   ) {}
 
   // kafka producer
@@ -37,14 +40,22 @@ export class EventManagementService {
     });
   }
 
-  async create(createEventManagementDto: CreateEventManagementDto) {
-    await this.eventsRepository.insert(createEventManagementDto);
-    // this.kafkaProducer('eventCreated', 'event created successfully');
-    // this.kafkaConsumer('eventCreated');
-    return {
-      status: HttpStatus.ACCEPTED,
-      message: 'Event Inserted successfull.',
-    };
+  async create(createEventManagementDto: CreateEventManagementDto,User:JWT_PayloadInterface) {
+    try {
+      const dataToCreate={...createEventManagementDto,eventOrganizerId:User.id,eventOrganizer:User.id}
+      await this.eventsRepository.insert(dataToCreate);
+      this.socket.server.emit('eventcreated', "event created")
+      // this.kafkaProducer('eventCreated', 'event created successfully');
+      // this.kafkaConsumer('eventCreated');
+      return {
+        status: HttpStatus.ACCEPTED,
+        message: 'Event Inserted successfull.',
+      };
+      
+    } catch (error) {
+      this.socket.server.emit('eventcreated', "event error")
+    }
+   
   }
 
   async getOrganizerEvents(id: string) {
@@ -117,10 +128,12 @@ export class EventManagementService {
   }
 
   async remove(id: number, req) {
-    const event = await this.eventsRepository.findOne({ where: { id } });
+    const payload:JWT_PayloadInterface=req.user
+    const event = await this.eventsRepository.findOne({ where: { id }});
+    
     if (
-      (event && req.user.id == event.eventOrganizer) ||
-      (event && req.user.role === 'admin')
+      (event && payload.id === event.eventOrganizerId) ||
+      (event && payload.role === 'admin')
     ) {
       await this.eventsRepository.delete(id);
       return {

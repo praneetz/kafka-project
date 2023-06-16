@@ -29,7 +29,6 @@ export class CreateEventManagementDto {
 
   @ApiProperty({ description: 'testing event name', example: '121223sdasd' })
   @IsOptional()
-  @IsNumber()
   @IsNotEmpty()
   eventOrganizer:string
 }

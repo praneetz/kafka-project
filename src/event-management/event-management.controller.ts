@@ -20,6 +20,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/core/enum';
 import { Roles } from 'src/auth/roles.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JWT_PayloadInterface } from 'src/core/interfaces';
 
 @ApiTags('event-management')
 @Controller('event')
@@ -33,11 +34,11 @@ export class EventManagementController {
   @ApiBearerAuth()
   @Post()
   async create(
-    @Req() req: { user: { id: string } },
+    @Req() req,
     @Body() createEventManagementDto: CreateEventManagementDto,
   ) {
-    createEventManagementDto.eventOrganizer = req.user.id;
-    return this.eventManagementService.create(createEventManagementDto);
+    const user:JWT_PayloadInterface=req.user;
+    return this.eventManagementService.create(createEventManagementDto,user);
   }
 
   // get organizer event
