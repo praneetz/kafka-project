@@ -20,8 +20,13 @@ export class JoineeService {
     };
   }
 
-  findAll() {
-    return `This action returns all joinee`;
+  async findAll() {
+    const data = await this.joineeRepository.find({ relations: ['event'] });
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: 'This action returns all joinee`',
+      data,
+    };
   }
 
   findOne(id: number) {

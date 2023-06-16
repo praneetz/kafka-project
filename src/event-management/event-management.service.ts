@@ -71,7 +71,10 @@ export class EventManagementService {
 
   async findOne(id: number) {
     try {
-      const event = await this.eventsRepository.findOne({ where: { id } });
+      const event = await this.eventsRepository.findOne({
+        where: { id },
+        relations: ['eventOrganizer'],
+      });
       if (!event) {
         return {
           status: HttpStatus.NOT_FOUND,
