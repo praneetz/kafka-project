@@ -73,7 +73,7 @@ export class EventManagementService {
     try {
       const event = await this.eventsRepository.findOne({
         where: { id },
-        relations: ['eventOrganizer'],
+        relations: ['eventOrganizer','joinee'],
       });
       if (!event) {
         return {
