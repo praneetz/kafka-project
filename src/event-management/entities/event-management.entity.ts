@@ -29,9 +29,10 @@ export class Event {
   @Column()
   eventDescription: string;
 
-  @Column()
-  eventOrganizerId:string
+  // @Column()
+  // eventOrganizerId:string
 
+  @Column()
   @ManyToOne(() => Users, (user) => user.id)
   @JoinColumn({ name: 'eventOrganizer' })
   eventOrganizer: string;

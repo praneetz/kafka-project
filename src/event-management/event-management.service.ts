@@ -130,9 +130,10 @@ export class EventManagementService {
   async remove(id: number, req) {
     const payload:JWT_PayloadInterface=req.user
     const event = await this.eventsRepository.findOne({ where: { id }});
+    console.log("=>",event)
     
     if (
-      (event && payload.id === event.eventOrganizerId) ||
+      (event && payload.id === event.eventOrganizer) ||
       (event && payload.role === 'admin')
     ) {
       await this.eventsRepository.delete(id);
