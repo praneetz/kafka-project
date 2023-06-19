@@ -3,7 +3,9 @@ import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServe
 import { Server } from 'socket.io';
 
 @Controller()
-@WebSocketGateway()
+@WebSocketGateway({
+  origin:['*']
+})
 export class SocketGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
