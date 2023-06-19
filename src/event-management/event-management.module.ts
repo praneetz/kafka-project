@@ -5,10 +5,12 @@ import { Event } from './entities/event-management.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/users/user.module';
 import { SocketModule } from 'src/socket/socket.module';
+import { Joinee } from 'src/joinee/entities/joinee.entity';
+
 
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Event]),SocketModule,UsersModule],
+  imports:[TypeOrmModule.forFeature([Event,Joinee]),SocketModule,UsersModule],
   controllers: [EventManagementController],
   providers: [EventManagementService,]
 })

@@ -7,12 +7,15 @@ import { Event } from './entities/event-management.entity';
 import kafkaConfig from '../kafka.config';
 import { SocketGateway } from 'src/socket/chat.gateway';
 import {JWT_PayloadInterface }from "src/core/interfaces"
+import { Joinee } from 'src/joinee/entities/joinee.entity';
 
 @Injectable()
 export class EventManagementService {
   constructor(
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
+    @InjectRepository(Joinee)
+    private JoineeModel: Repository<Joinee>,
     private readonly socket: SocketGateway
   ) {}
 
@@ -128,13 +131,13 @@ export class EventManagementService {
   }
 
   async remove(id: number, req) {
-    const payload:JWT_PayloadInterface=req.user
+    const payload:JWT_PayloadInterface=req.user;
+    await this.JoineeModel.delete({event:`${id}`})
     const event = await this.eventsRepository.findOne({ where: { id }});
-    console.log("=>",event)
     
     if (
       (event && payload.id === event.eventOrganizer) ||
-      (event && payload.role === 'admin')
+      (event && payload.role === 'admin') 
     ) {
       await this.eventsRepository.delete(id);
       return {
