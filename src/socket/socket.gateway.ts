@@ -3,9 +3,7 @@ import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServe
 import { Server } from 'socket.io';
 
 @Controller()
-@WebSocketGateway({
-  origin:['*']
-})
+@WebSocketGateway()
 export class SocketGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -40,6 +38,4 @@ export class SocketGateway implements OnGatewayConnection {
   login(){
     
   }
-
-  
 }
