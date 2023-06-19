@@ -5,17 +5,19 @@ import { ApiTags } from '@nestjs/swagger';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { UserDto } from 'src/users/dto/user.dto';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 
 
 @ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService, private readonly socket:SocketGateway) { }
 
     @UseGuards(AuthGuard('local'))
     @Post('login')
     async login(@Request() req, @Body() Creds: LoginDto) {
+        this.socket.server.emit("login",`Someone login to the server with id ${req.user.id}`)
         return await this.authService.login(req.user);
     }
 

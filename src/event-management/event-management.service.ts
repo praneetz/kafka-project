@@ -5,7 +5,7 @@ import { CreateEventManagementDto } from './dto/create-event-management.dto';
 import { UpdateEventManagementDto } from './dto/update-event-management.dto';
 import { Event } from './entities/event-management.entity';
 import kafkaConfig from '../kafka.config';
-import { SocketGateway } from 'src/socket/chat.gateway';
+import { SocketGateway } from 'src/socket/socket.gateway';
 import {JWT_PayloadInterface }from "src/core/interfaces"
 import { Joinee } from 'src/joinee/entities/joinee.entity';
 
@@ -47,7 +47,7 @@ export class EventManagementService {
     try {
       const dataToCreate={...createEventManagementDto,eventOrganizerId:User.id,eventOrganizer:User.id}
       await this.eventsRepository.insert(dataToCreate);
-      this.socket.server.emit('eventcreated', "event created")
+      this.socket.server.emit('create_event', "Event created")
       // this.kafkaProducer('eventCreated', 'event created successfully');
       // this.kafkaConsumer('eventCreated');
       return {
@@ -119,6 +119,7 @@ export class EventManagementService {
       (event && req.user.role === 'admin')
     ) {
       await this.eventsRepository.save({ id: id, ...updateEventManagementDto });
+      this.socket.server.emit('update_event', "Event updated")
       return {
         status: HttpStatus.ACCEPTED,
         message: 'Event Updated successfull.',
@@ -140,6 +141,7 @@ export class EventManagementService {
       (event && payload.role === 'admin') 
     ) {
       await this.eventsRepository.delete(id);
+      this.socket.server.emit('delete_event', "Event deleted")
       return {
         status: HttpStatus.ACCEPTED,
         message: 'Event deleted successfull.',

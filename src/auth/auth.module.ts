@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from 'src/users/user.module';
 import { Users } from 'src/users/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
             secret: process.env.JWTKEY,
             signOptions: { expiresIn: process.env.TOKEN_EXPIRATION },
         }),
+        SocketModule
     ],
     providers: [
         AuthService,
