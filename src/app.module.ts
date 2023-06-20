@@ -29,6 +29,7 @@ import { SocketModule } from './socket/socket.module';
     AuthModule,
     UsersModule,
     EventManagementModule,
+    
     JoineeModule,
   ],
   controllers: [AppController],
