@@ -2,11 +2,12 @@ import { Controller, Logger } from '@nestjs/common';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server,Socket } from 'socket.io';
 
-@Controller()
+// @Controller()
 @WebSocketGateway({
   allowEIO3: true,
   cors: {
     options: "*",
+    origin:'*'
   },
   transports: ["websocket", "polling"],
 })
