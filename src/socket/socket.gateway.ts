@@ -1,15 +1,37 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server,Socket } from 'socket.io';
 
 @Controller()
-@WebSocketGateway()
+@WebSocketGateway({
+  allowEIO3: true,
+  cors: {
+    options: "*",
+  },
+  transports: ["websocket", "polling"],
+})
 export class SocketGateway implements OnGatewayConnection {
-  @WebSocketServer()
-  server: Server;
+  constructor( ){}
+  @WebSocketServer() server: Server;
 
-  handleConnection(client: any, ...args: any[]) {
-    console.log('Client connected');
+
+
+  afterInit(server: Server) {
+    console.log('Initialized');
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log(`Client Disconnected: ${client.id}`);
+  }
+
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(`Client Connected: ${client.id}`);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(client: Socket, payload: string): Promise<void> {
+    console.log(payload)
+    this.server.emit('receiveMessage', `${payload} from server`);
   }
 
   @SubscribeMessage("create_event")
